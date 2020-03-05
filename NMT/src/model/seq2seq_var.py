@@ -500,8 +500,8 @@ class LatentJoint(nn.Module):
             return mu
 
     def forward(self, lang1_hiddens, lang2_hiddens):
-        lang1_hiddens_mean = torch.mean(self.lang1_hiddens, dim=0) # (bs, hidden_dim)
-        lang2_hiddens_mean = torch.mean(self.lang2_hiddens, dim=0) # (bs, hidden_dim)
+        lang1_hiddens_mean = torch.mean(lang1_hiddens, dim=0) # (bs, hidden_dim)
+        lang2_hiddens_mean = torch.mean(lang2_hiddens, dim=0) # (bs, hidden_dim)
         lang_joint_hiddens = torch.cat((lang1_hiddens_mean, lang2_hiddens_mean), dim=1) # (bs, hidden_dim * 2)
 
         mu = self.mu(lang_joint_hiddens) # (bs, latent_dim)
