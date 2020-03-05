@@ -554,12 +554,15 @@ class TrainerMT(MultiprocessingEventLoop):
 
         encoder_params = get_flat_params(self.encoder).cpu().share_memory_()
         decoder_params = get_flat_params(self.decoder).cpu().share_memory_()
+        latent_params = get_flat_params(self.latent).cpu().share_memory_()
+        latent_joint_params = get_flat_params(self.latent_joint).cpu().share_memory_()
 
         for rank in range(self.num_replicas):
             self.call_async(rank, '_async_otf_sync_params', encoder_params=encoder_params,
-                            decoder_params=decoder_params)
+                            decoder_params=decoder_params, latent_params=latent_params,
+                            latent_joint_params=latent_joint_params)
 
-    def _async_otf_sync_params(self, rank, device_id, encoder_params, decoder_params):
+    def _async_otf_sync_params(self, rank, device_id, encoder_params, decoder_params, latent_params, latent_joint_params):
 
         def set_flat_params(module, flat):
             params = [p.data for p in module.parameters()]
@@ -569,6 +572,8 @@ class TrainerMT(MultiprocessingEventLoop):
         # copy parameters back into modules
         set_flat_params(self.encoder, encoder_params)
         set_flat_params(self.decoder, decoder_params)
+        set_flat_params(self.latent, latent_params)
+        set_flat_params(self.latent_joint, latent_joint_params)
 
     def otf_bt_gen_async(self, init_cache_size=None):
         logger.info("Populating initial OTF generation cache ...")
