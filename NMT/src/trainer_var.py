@@ -61,7 +61,7 @@ class TrainerMT(MultiprocessingEventLoop):
             params.dec_optimizer = params.enc_optimizer
         self.enc_optimizer = get_optimizer(enc_params, params.enc_optimizer) if len(enc_params) > 0 else None
         self.dec_optimizer = get_optimizer(decoder.parameters(), params.dec_optimizer)
-        self.lat_optimizer = get_optimizer(latent.parameters(), params.latent_optimizer)
+        self.lat_optimizer = get_optimizer(latent_var.parameters(), params.latent_optimizer)
         self.lat_joint_optimizer = get_optimizer(latent_joint.parameters(), params.latent_optimizer)
         self.dis_optimizer = get_optimizer(discriminator.parameters(), params.dis_optimizer) if discriminator is not None else None
         self.lm_optimizer = get_optimizer(lm.parameters(), params.enc_optimizer) if lm is not None else None
