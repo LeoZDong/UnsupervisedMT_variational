@@ -543,7 +543,7 @@ class TrainerMT(MultiprocessingEventLoop):
         self.params.cpu_thread = True
         self.data = None  # do not load data in the CPU threads
         self.iterators = {}
-        self.encoder, self.decoder, _, _, _, _ = build_mt_model(self.params, self.data, cuda=False)
+        self.encoder, self.decoder, self.latent, self.latent_joint, _, _ = build_mt_model(self.params, self.data, cuda=False)
 
     def otf_sync_params(self):
         # logger.info("Syncing encoder and decoder params for OTF generation ...")
