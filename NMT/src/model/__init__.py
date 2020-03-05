@@ -96,6 +96,11 @@ def build_mt_model(params, data, cuda=True):
     if params.attention:
         from .attention import build_attention_model
         return build_attention_model(params, data, cuda=cuda)
+    elif params.variational:
+        print("Building variational seq2seq!")
+        from .seq2seq_var import build_seq2seq_model
+        return build_seq2seq_model(params, data, cuda=cuda)
     else:
+        print("building regular seq2seq!")
         from .seq2seq import build_seq2seq_model
         return build_seq2seq_model(params, data, cuda=cuda)

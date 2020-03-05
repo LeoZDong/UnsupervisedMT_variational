@@ -12,8 +12,8 @@ import argparse
 from src.data.loader import check_all_data_params, load_data
 from src.utils import bool_flag, initialize_exp
 from src.model import check_mt_model_params, build_mt_model
-from src.trainer import TrainerMT
-from src.evaluator import EvaluatorMT
+from src.trainer_var import TrainerMT
+from src.evaluator_var import EvaluatorMT
 
 
 def get_parser():
@@ -48,9 +48,11 @@ def get_parser():
                         help="Label smoothing")
     parser.add_argument("--attention", type=bool_flag, default=False,
                         help="Use an attention mechanism")
+    parser.add_argument("--variational", type=bool_flag, default=True,
+                        help="Use variational latent space")
     if not parser.parse_known_args()[0].attention:
         parser.add_argument("--enc_dim", type=int, default=512,
-                            help="Latent space dimension")
+                            help="Latent space dimension (note: not latent variational sapce)")
         parser.add_argument("--proj_mode", type=str, default="last",
                             help="Projection mode (proj / pool / last)")
         parser.add_argument("--init_encoded", type=bool_flag, default=False,
@@ -245,10 +247,10 @@ def main(params):
     # initialize experiment / load data / build model
     logger = initialize_exp(params)
     data = load_data(params)
-    encoder, decoder, discriminator, lm = build_mt_model(params, data)
+    encoder, decoder, latent, latent_joint, discriminator, lm = build_mt_model(params, data)
 
     # initialize trainer / reload checkpoint / initialize evaluator
-    trainer = TrainerMT(encoder, decoder, discriminator, lm, data, params)
+    trainer = TrainerMT(encoder, decoder, latent, latent_joint, discriminator, lm, data, params)
     trainer.reload_checkpoint()
     trainer.test_sharing()  # check parameters sharing
     evaluator = EvaluatorMT(trainer, data, params)
