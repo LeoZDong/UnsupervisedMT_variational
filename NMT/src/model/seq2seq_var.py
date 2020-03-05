@@ -81,7 +81,7 @@ class Encoder(nn.Module):
 
         # LSTM layers / shared layers
         lstm = [
-            nn.LSTM(self.emb_dim + self.latent_dim, self.hidden_dim, num_layers=self.n_enc_layers, dropout=self.dropout)
+            nn.LSTM(self.emb_dim, self.hidden_dim, num_layers=self.n_enc_layers, dropout=self.dropout)
             for _ in range(self.n_langs)
         ]
         for k in range(self.n_enc_layers):
