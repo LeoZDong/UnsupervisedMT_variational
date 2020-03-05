@@ -554,6 +554,8 @@ def build_seq2seq_model(params, data, cuda=True):
     if cuda:
         encoder.cuda()
         decoder.cuda()
+        latent.cuda()
+        latent_joint.cuda()
         if len(params.vocab) > 0:
             decoder.vocab_mask_neg = [x.cuda() for x in decoder.vocab_mask_neg]
         if discriminator is not None:
