@@ -427,8 +427,8 @@ class Latent(nn.Module):
         self.latent_dim = params.latent_dim
         self.hidden_dim = params.hidden_dim
         self.n_langs = params.n_langs
-        mu = [nn.Linear(self.hidden_dim, latent_dim) for _ in range(self.n_langs)]
-        var = [nn.Linear(self.hidden_dim, latent_dim) for _ in range(self.n_langs)]
+        mu = [nn.Linear(self.hidden_dim, self.latent_dim) for _ in range(self.n_langs)]
+        var = [nn.Linear(self.hidden_dim, self.latent_dim) for _ in range(self.n_langs)]
         self.mu = nn.ModuleList(mu)
         self.var = nn.ModuleList(var)
 
