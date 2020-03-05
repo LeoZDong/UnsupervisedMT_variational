@@ -586,4 +586,4 @@ def build_seq2seq_model(params, data, cuda=True):
     logger.info("LM: {}".format(lm))
     logger.info("")
 
-    return encoder, decoder, latent, latent_joint discriminator, lm
+    return encoder, decoder, latent, latent_joint, discriminator, lm
