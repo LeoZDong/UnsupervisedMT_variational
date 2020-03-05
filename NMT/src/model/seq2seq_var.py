@@ -426,6 +426,7 @@ class Latent(nn.Module):
         super(Latent, self).__init__()
         self.latent_dim = params.latent_dim
         self.hidden_dim = params.hidden_dim
+        self.n_langs = params.n_langs
         mu = [nn.Linear(self.hidden_dim, latent_dim) for _ in range(self.n_langs)]
         var = [nn.Linear(self.hidden_dim, latent_dim) for _ in range(self.n_langs)]
         self.mu = nn.ModuleList(mu)
