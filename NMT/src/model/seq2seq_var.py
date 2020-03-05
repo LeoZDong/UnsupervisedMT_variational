@@ -478,7 +478,7 @@ class LatentJoint(nn.Module):
             - FloatTensor of size (seq_len, bs, hidden_dim) representing all hidden
             states of each sentence in the target langauge, for all sentences in a batch.
         """
-        super(Latent, self).__init__()
+        super(LatentJoint, self).__init__()
         self.latent_dim = params.latent_dim
         self.hidden_dim = params.hidden_dim
         self.mu = nn.Linear(self.hidden_dim * 2, latent_dim)
