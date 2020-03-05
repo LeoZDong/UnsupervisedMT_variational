@@ -27,14 +27,14 @@ class TrainerMT(MultiprocessingEventLoop):
 
     VALIDATION_METRICS = []
 
-    def __init__(self, encoder, decoder, latent_var, latent_joint, discriminator, lm, data, params):
+    def __init__(self, encoder, decoder, latent, latent_joint, discriminator, lm, data, params):
         """
         Initialize trainer.
         """
         super().__init__(device_ids=tuple(range(params.otf_num_processes)))
         self.encoder = encoder
         self.decoder = decoder
-        self.latent = latent_var # variational space for one langauge
+        self.latent = latent # variational space for one langauge
         self.latent_joint = latent_joint # variational space for both languages
         self.discriminator = discriminator
         self.lm = lm
@@ -61,7 +61,7 @@ class TrainerMT(MultiprocessingEventLoop):
             params.dec_optimizer = params.enc_optimizer
         self.enc_optimizer = get_optimizer(enc_params, params.enc_optimizer) if len(enc_params) > 0 else None
         self.dec_optimizer = get_optimizer(decoder.parameters(), params.dec_optimizer)
-        self.lat_optimizer = get_optimizer(latent_var.parameters(), params.latent_optimizer)
+        self.lat_optimizer = get_optimizer(latent.parameters(), params.latent_optimizer)
         self.lat_joint_optimizer = get_optimizer(latent_joint.parameters(), params.latent_optimizer)
         self.dis_optimizer = get_optimizer(discriminator.parameters(), params.dis_optimizer) if discriminator is not None else None
         self.lm_optimizer = get_optimizer(lm.parameters(), params.enc_optimizer) if lm is not None else None
@@ -817,6 +817,8 @@ class TrainerMT(MultiprocessingEventLoop):
         torch.save({
             'enc': self.encoder,
             'dec': self.decoder,
+            'latent': self.latent,
+            'latent_joint': self.latent_joint,
             'dis': self.discriminator,
             'lm': self.lm,
         }, path)
@@ -866,6 +868,7 @@ class TrainerMT(MultiprocessingEventLoop):
         self.enc_optimizer = checkpoint_data['enc_optimizer']
         self.dec_optimizer = checkpoint_data['dec_optimizer']
         self.lat_optimizer = checkpoint_data['lat_optimizer']
+        self.lat_joint_optimizer = checkpoint_data['lat_joint_optimizer']
         self.dis_optimizer = checkpoint_data['dis_optimizer']
         self.lm_optimizer = checkpoint_data['lm_optimizer']
         self.epoch = checkpoint_data['epoch']
@@ -877,6 +880,9 @@ class TrainerMT(MultiprocessingEventLoop):
             'dec': (self.decoder, self.dec_optimizer),
             'dis': (self.discriminator, self.dis_optimizer),
             'lm': (self.lm, self.lm_optimizer),
+            'latent': (self.latent, self.lat_optimizer),
+            'latent_joint': (self.latent_joint, self.lat_joint_optimizer),
+            'dis': self.discriminator,
         }
         logger.warning('Checkpoint reloaded. Resuming at epoch %i ...' % self.epoch)
 
