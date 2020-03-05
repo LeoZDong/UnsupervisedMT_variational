@@ -50,6 +50,7 @@ class Encoder(nn.Module):
         self.share_lang_emb = params.share_lang_emb
         self.emb_dim = params.emb_dim
         self.hidden_dim = params.hidden_dim
+        self.latent_dim = params.latent_dim
         self.dropout = params.dropout
         self.n_enc_layers = params.n_enc_layers
         self.enc_dim = params.enc_dim
