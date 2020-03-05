@@ -222,7 +222,7 @@ class EvaluatorMT(object):
             encoded = self.encoder(sent2_.cuda(), len2_, lang2_id)
             mu_2, var_2 = self.latent(encoded.enc_hiddens, lang2_id)
             latent_resampled_2 = self.latent.reparameterize(mu_2, var_2)
-            decoded = self.decoder(encoded, latent_resampled_2, sent3[:-1], lang3_id)
+            decoded, _ = self.decoder(encoded, latent_resampled_2, sent3[:-1], lang3_id)
             sent3_, len3_, _ = self.decoder.generate(encoded, latent_resampled_2, lang3_id)
 
             # cross-entropy loss
