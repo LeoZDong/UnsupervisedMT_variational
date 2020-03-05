@@ -145,7 +145,6 @@ class TrainerMT(MultiprocessingEventLoop):
         parse_lambda_config(params, 'lambda_xe_otfa')
         parse_lambda_config(params, 'lambda_dis')
         parse_lambda_config(params, 'lambda_lm')
-        parse_lambda_config(params, 'lambda_latent')
 
     def init_bpe(self):
         """
