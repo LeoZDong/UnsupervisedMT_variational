@@ -27,14 +27,14 @@ class TrainerMT(MultiprocessingEventLoop):
 
     VALIDATION_METRICS = []
 
-    def __init__(self, encoder, decoder, latent, latent_joint, discriminator, lm, data, params):
+    def __init__(self, encoder, decoder, latent_var, latent_joint, discriminator, lm, data, params):
         """
         Initialize trainer.
         """
         super().__init__(device_ids=tuple(range(params.otf_num_processes)))
         self.encoder = encoder
         self.decoder = decoder
-        self.latent = latent # variational space for one langauge
+        self.latent = latent_var # variational space for one langauge
         self.latent_joint = latent_joint # variational space for both languages
         self.discriminator = discriminator
         self.lm = lm
@@ -828,11 +828,15 @@ class TrainerMT(MultiprocessingEventLoop):
         checkpoint_data = {
             'encoder': self.encoder,
             'decoder': self.decoder,
+            'latent': self.latent,
+            'latent_joint': self.latent_joint,
             'discriminator': self.discriminator,
             'lm': self.lm,
             'enc_optimizer': self.enc_optimizer,
             'dec_optimizer': self.dec_optimizer,
             'dis_optimizer': self.dis_optimizer,
+            'lat_optimizer':self.lat_optimizer,
+            'lat_joint_optimizer':self.lat_joint_optimizer,
             'lm_optimizer': self.lm_optimizer,
             'epoch': self.epoch,
             'n_total_iter': self.n_total_iter,
@@ -855,10 +859,13 @@ class TrainerMT(MultiprocessingEventLoop):
         checkpoint_data = torch.load(checkpoint_path)
         self.encoder = checkpoint_data['encoder']
         self.decoder = checkpoint_data['decoder']
+        self.latent = checkpoint_data['latent']
+        self.latent_joint = checkpoint_data['latent_joint']
         self.discriminator = checkpoint_data['discriminator']
         self.lm = checkpoint_data['lm']
         self.enc_optimizer = checkpoint_data['enc_optimizer']
         self.dec_optimizer = checkpoint_data['dec_optimizer']
+        self.lat_optimizer = checkpoint_data['lat_optimizer']
         self.dis_optimizer = checkpoint_data['dis_optimizer']
         self.lm_optimizer = checkpoint_data['lm_optimizer']
         self.epoch = checkpoint_data['epoch']
