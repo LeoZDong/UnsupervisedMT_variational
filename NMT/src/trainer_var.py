@@ -634,6 +634,8 @@ class TrainerMT(MultiprocessingEventLoop):
         params = self.params
         self.encoder.eval()
         self.decoder.eval()
+        self.latent.eval()
+        self.latent_joint.eval()
 
         results = []
 
@@ -648,11 +650,15 @@ class TrainerMT(MultiprocessingEventLoop):
 
                 # lang1 -> lang2
                 encoded = self.encoder(sent1, len1, lang_id=lang1_id)
+                # latent space conditioned on one language
+                mu_lat, var_lat = self.latent(encoded.enc_hiddens, lang1_id)
+                latent_resampled = self.latent.reparameterize(mu_lat, var_lat)
+
                 max_len = int(1.5 * len1.max() + 10)
                 if params.otf_sample == -1:
-                    sent2, len2, _ = self.decoder.generate(encoded, lang_id=lang2_id, max_len=max_len)
+                    sent2, len2, _ = self.decoder.generate(encoded, latent_resampled, lang_id=lang2_id, max_len=max_len)
                 else:
-                    sent2, len2, _ = self.decoder.generate(encoded, lang_id=lang2_id, max_len=max_len,
+                    sent2, len2, _ = self.decoder.generate(encoded, latent_resampled, lang_id=lang2_id, max_len=max_len,
                                                            sample=True, temperature=params.otf_sample)
 
                 # keep cached batches on CPU for easier transfer
@@ -686,6 +692,8 @@ class TrainerMT(MultiprocessingEventLoop):
         n_words3 = params.n_words[lang3_id]
         self.encoder.train()
         self.decoder.train()
+        self.latent.train()
+        self.latent_joint.train()
 
         # prepare batch
         sent1, sent2, sent3 = sent1.cuda(), sent2.cuda(), sent3.cuda()
@@ -694,10 +702,15 @@ class TrainerMT(MultiprocessingEventLoop):
         if backprop_temperature == -1:
             # lang2 -> lang3
             encoded = self.encoder(sent2, len2, lang_id=lang2_id)
+            mu_lat, var_lat = self.latent(encoded.enc_hiddens, lang2_id)
+            latent_resampled = self.latent.reparameterize(mu_lat, var_lat)
         else:
             # lang1 -> lang2
             encoded = self.encoder(sent1, len1, lang_id=lang1_id)
-            scores = self.decoder(encoded, sent2[:-1], lang_id=lang2_id)
+            mu_lat, var_lat = self.latent(encoded.enc_hiddens, lang1_id)
+            latent_resampled = self.latent.reparameterize(mu_lat, var_lat)
+
+            scores, _ = self.decoder(encoded, latent_resampled, sent2[:-1], lang_id=lang2_id)
             assert scores.size() == (len2.max() - 1, bs, n_words2)
 
             # lang2 -> lang3
@@ -707,7 +720,7 @@ class TrainerMT(MultiprocessingEventLoop):
             encoded = self.encoder(sent2_input, len2, lang_id=lang2_id)
 
         # cross-entropy scores / loss
-        scores = self.decoder(encoded, sent3[:-1], lang_id=lang3_id)
+        scores, _ = self.decoder(encoded, latent_resampled, sent3[:-1], lang_id=lang3_id)
         xe_loss = loss_fn(scores.view(-1, n_words3), sent3[1:].view(-1))
         self.stats['xe_costs_%s_%s_%s' % direction].append(xe_loss.item())
         assert lambda_xe > 0
