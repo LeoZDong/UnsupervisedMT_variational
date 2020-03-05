@@ -145,6 +145,7 @@ class TrainerMT(MultiprocessingEventLoop):
         parse_lambda_config(params, 'lambda_xe_otfa')
         parse_lambda_config(params, 'lambda_dis')
         parse_lambda_config(params, 'lambda_lm')
+        parse_lambda_config(params, 'lambda_latent')
 
     def init_bpe(self):
         """
@@ -509,7 +510,7 @@ class TrainerMT(MultiprocessingEventLoop):
 
         # total loss
         assert lambda_xe > 0
-        loss = lambda_xe * xe_loss + params.lambda_lat * kld
+        loss = lambda_xe * xe_loss + kld
         if params.lambda_dis:
             loss = loss + params.lambda_dis * dis_loss
 
