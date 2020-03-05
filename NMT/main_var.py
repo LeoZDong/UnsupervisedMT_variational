@@ -200,7 +200,7 @@ def get_parser():
                         help="Decoder optimizer (SGD / RMSprop / Adam, etc.)")
     parser.add_argument("--dis_optimizer", type=str, default="rmsprop,lr=0.0005",
                         help="Discriminator optimizer (SGD / RMSprop / Adam, etc.)")
-    parser.add_argument("--latent_optimizer", type=str, default="enc_optimizer",
+    parser.add_argument("--latent_optimizer", type=str, default="adam,lr=0.0003",
                         help="Latent space optimizer (SGD / RMSprop / Adam, etc.)")
     parser.add_argument("--clip_grad_norm", type=float, default=5,
                         help="Clip gradients norm (0 to disable)")
