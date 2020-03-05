@@ -12,7 +12,7 @@ from collections import namedtuple
 LSTM_PARAMS = ['weight_ih_l%i', 'weight_hh_l%i', 'bias_ih_l%i', 'bias_hh_l%i']
 BILSTM_PARAMS = LSTM_PARAMS + ['%s_reverse' % x for x in LSTM_PARAMS]
 
-LatentState = namedtuple('LatentState', 'dec_input, dis_input, input_len', 'enc_hiddens')
+LatentState = namedtuple('LatentState', 'dec_input, dis_input, input_len, enc_hiddens')
 
 
 def check_mt_model_params(params):
