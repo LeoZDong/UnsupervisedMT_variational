@@ -350,18 +350,18 @@ def main(params):
         logger.info("====================== End of epoch %i ======================" % trainer.epoch)
 
         # evaluate discriminator / perplexity / BLEU
-        scores = evaluator.run_all_evals(trainer.epoch)
+        # scores = evaluator.run_all_evals(trainer.epoch)
 
         # print / JSON log
-        for k, v in scores.items():
-            logger.info('%s -> %.6f' % (k, v))
-        logger.info("__log__:%s" % json.dumps(scores))
+        # for k, v in scores.items():
+        #     logger.info('%s -> %.6f' % (k, v))
+        # logger.info("__log__:%s" % json.dumps(scores))
 
         # save best / save periodic / end epoch
-        trainer.save_best_model(scores)
-        trainer.save_periodic()
-        trainer.end_epoch(scores)
-        trainer.test_sharing()
+        # trainer.save_best_model(scores)
+        # trainer.save_periodic()
+        # trainer.end_epoch(scores)
+        # trainer.test_sharing()
 
 
 if __name__ == '__main__':
