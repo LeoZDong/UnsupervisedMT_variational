@@ -16,6 +16,9 @@ from src.trainer import TrainerMT
 from src.evaluator import EvaluatorMT
 import torch
 
+import logging
+logging.basicConfig(filename='run_base.txt',level=logging.DEBUG)
+
 def get_parser():
     # parse parameters
     parser = argparse.ArgumentParser(description='Language transfer')

@@ -14,7 +14,10 @@ from src.utils import bool_flag, initialize_exp
 from src.model import check_mt_model_params, build_mt_model
 from src.trainer_var import TrainerMT
 from src.evaluator_var import EvaluatorMT
+import torch
 
+import logging
+logging.basicConfig(filename='run_var.txt',level=logging.DEBUG)
 
 def get_parser():
     # parse parameters
