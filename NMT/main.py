@@ -361,6 +361,7 @@ def main(params):
         # trainer.save_best_model(scores)
         # trainer.save_periodic()
         # trainer.end_epoch(scores)
+        trainer.end_epoch(1)
         # trainer.test_sharing()
 
 

@@ -496,8 +496,10 @@ class TrainerMT(MultiprocessingEventLoop):
         xe_loss = loss_fn(scores.view(-1, n_words), sent2[1:].view(-1))
         if back:
             self.stats['xe_costs_bt_%s_%s' % (lang1, lang2)].append(xe_loss.item())
+            self.stats['kld_bt_%s_%s' % (lang1, lang2)].append(kld)
         else:
-            self.stats['xe_costs_%s_%s' % (lang1, lang2)].append(xe_loss.item())
+            self.stats['xe_costs_%s _%s' % (lang1, lang2)].append(xe_loss.item())
+            self.stats['kld_%s_%s' % (lang1, lang2)].append(kld)
 
         # discriminator feedback loss
         if params.lambda_dis:
@@ -775,8 +777,10 @@ class TrainerMT(MultiprocessingEventLoop):
                 mean_loss.append(('XE-%s-%s' % (lang, lang), 'xe_costs_%s_%s' % (lang, lang)))
             for lang1, lang2 in self.params.para_directions:
                 mean_loss.append(('XE-%s-%s' % (lang1, lang2), 'xe_costs_%s_%s' % (lang1, lang2)))
+                mean_loss.append(('KLD-%s-%s' % (lang1, lang2), 'kld_%s_%s' % (lang1, lang2)))
             for lang1, lang2 in self.params.back_directions:
                 mean_loss.append(('XE-BT-%s-%s' % (lang1, lang2), 'xe_costs_bt_%s_%s' % (lang1, lang2)))
+                mean_loss.append(('KLD-BT-%s-%s' % (lang1, lang2), 'kld_bt_%s_%s' % (lang1, lang2)))
             for lang1, lang2, lang3 in self.params.pivo_directions:
                 mean_loss.append(('XE-%s-%s-%s' % (lang1, lang2, lang3), 'xe_costs_%s_%s_%s' % (lang1, lang2, lang3)))
             for lang in self.params.langs:
