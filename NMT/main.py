@@ -48,6 +48,8 @@ def get_parser():
                         help="Label smoothing")
     parser.add_argument("--attention", type=bool_flag, default=False,
                         help="Use an attention mechanism")
+    parser.add_argument("--variational", type=bool_flag, default=False,
+                        help="Use variational latent space")
     if not parser.parse_known_args()[0].attention:
         parser.add_argument("--enc_dim", type=int, default=512,
                             help="Latent space dimension")
