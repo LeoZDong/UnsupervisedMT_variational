@@ -474,8 +474,4 @@ def build_seq2seq_model(params, data, cuda=True):
     logger.info("LM: {}".format(lm))
     logger.info("")
 
-    encoder.flatten_parameters()
-    decoder.flatten_parameters()
-    lm.flatten_parameters()
-
     return encoder, decoder, discriminator, lm
