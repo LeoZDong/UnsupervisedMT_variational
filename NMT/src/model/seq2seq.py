@@ -131,6 +131,7 @@ class Encoder(nn.Module):
         assert embeddings.size() == (slen, bs, self.emb_dim)
 
         # LSTM
+        lstm_layer.flatten_parameters()
         lstm_output, (_, _) = lstm_layer(embeddings)
         assert lstm_output.size() == (slen, bs, self.hidden_dim)
 
@@ -303,6 +304,7 @@ class Decoder(nn.Module):
             lstm_input = torch.cat([embeddings, encoded], 2)
 
         # LSTM
+        lstm_layer.flatten_parameters()
         lstm_output, (_, _) = lstm_layer(lstm_input, init)
         assert lstm_output.size() == (slen, bs, self.hidden_dim)
 
@@ -353,6 +355,8 @@ class Decoder(nn.Module):
             embeddings = F.dropout(embeddings, p=self.dropout, training=self.training)
             if not self.init_encoded:
                 embeddings = torch.cat([embeddings, latent], 1)
+
+            lstm_layer.flatten_parameters()
             lstm_output, h_c = lstm_layer(embeddings.unsqueeze(0), h_c)
             output = F.dropout(lstm_output, p=self.dropout, training=self.training).view(bs, self.hidden_dim)
             if lstm_proj_layer is not None:
