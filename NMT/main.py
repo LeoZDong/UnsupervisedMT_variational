@@ -14,7 +14,7 @@ from src.utils import bool_flag, initialize_exp
 from src.model import check_mt_model_params, build_mt_model
 from src.trainer import TrainerMT
 from src.evaluator import EvaluatorMT
-
+import torch
 
 def get_parser():
     # parse parameters
