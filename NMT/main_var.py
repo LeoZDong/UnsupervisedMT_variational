@@ -17,6 +17,7 @@ from src.evaluator_var import EvaluatorMT
 import torch
 
 import logging
+open('run_var.txt', 'w').close()
 logging.basicConfig(filename='run_var.txt',level=logging.DEBUG)
 
 def get_parser():
@@ -347,7 +348,7 @@ def main(params):
         logger.info("====================== End of epoch %i ======================" % trainer.epoch)
 
         # evaluate discriminator / perplexity / BLEU
-        scores = evaluator.run_all_evals(trainer.epoch)
+        # scores = evaluator.run_all_evals(trainer.epoch)
 
         # print / JSON log
         for k, v in scores.items():
