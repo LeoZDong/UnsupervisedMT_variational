@@ -166,6 +166,7 @@ echo "EN monolingual data concatenated in: $SRC_RAW"
 echo "FR monolingual data concatenated in: $TGT_RAW"
 
 # check number of lines
+echo "$(wc -l < $SRC_RAW)"
 if ! [[ "$(wc -l < $SRC_RAW)" -eq "$N_MONO" ]]; then echo "ERROR: Number of lines doesn't match! Be sure you have $N_MONO sentences in your EN monolingual data."; exit; fi
 if ! [[ "$(wc -l < $TGT_RAW)" -eq "$N_MONO" ]]; then echo "ERROR: Number of lines doesn't match! Be sure you have $N_MONO sentences in your FR monolingual data."; exit; fi
 
