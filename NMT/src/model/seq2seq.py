@@ -146,7 +146,7 @@ class Encoder(nn.Module):
             elif self.proj_mode == 'last':
                 latent_state = h_t
 
-        return LatentState(input_len=lengths, dec_input=latent_state, dis_input=latent_state)
+        return LatentState(input_len=lengths, dec_input=latent_state, dis_input=latent_state, enc_hiddens=None)
 
 
 class Decoder(nn.Module):
