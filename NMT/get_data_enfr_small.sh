@@ -146,15 +146,15 @@ wget -c http://www.statmt.org/wmt14/training-monolingual-news-crawl/news.2010.fr
 # wget -c http://data.statmt.org/wmt17/translation-task/news.2017.fr.shuffled.gz
 
 # decompress monolingual data
-for FILENAME in news*gz; do
-  OUTPUT="${FILENAME::-3}"
-  if [ ! -f "$OUTPUT" ]; then
-    echo "Decompressing $FILENAME..."
-    gunzip -k $FILENAME
-  else
-    echo "$OUTPUT already decompressed."
-  fi
-done
+# for FILENAME in news*gz; do
+#   OUTPUT="${FILENAME::-3}"
+#   if [ ! -f "$OUTPUT" ]; then
+#     echo "Decompressing $FILENAME..."
+#     gunzip -k $FILENAME
+#   else
+#     echo "$OUTPUT already decompressed."
+#   fi
+# done
 
 # concatenate monolingual data files
 if ! [[ -f "$SRC_RAW" && -f "$TGT_RAW" ]]; then
