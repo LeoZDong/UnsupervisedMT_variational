@@ -282,6 +282,8 @@ def load_mono_data(params, data):
             if lang not in data['dico']:
                 data['dico'][lang] = mono_data['dico']
             else:
+                print(data['dico'][lang])
+                print(mono_data['dico'])
                 assert data['dico'][lang] == mono_data['dico']
 
             # monolingual data
