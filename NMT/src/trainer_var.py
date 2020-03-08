@@ -116,7 +116,7 @@ class TrainerMT(MultiprocessingEventLoop):
         }
         for lang in params.mono_directions:
             self.stats['xe_costs_%s_%s' % (lang, lang)] = []
-            self.stats['kld_%s_%s' % (lang1, lang2)] = []
+            self.stats['kld_%s_%s' % (lang, lang)] = []
         for lang1, lang2 in params.para_directions:
             self.stats['xe_costs_%s_%s' % (lang1, lang2)] = []
             self.stats['kld_%s_%s' % (lang1, lang2)] = []
