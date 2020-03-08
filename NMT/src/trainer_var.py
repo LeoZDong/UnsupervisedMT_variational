@@ -499,10 +499,10 @@ class TrainerMT(MultiprocessingEventLoop):
         xe_loss = loss_fn(scores.view(-1, n_words), sent2[1:].view(-1))
         if back:
             self.stats['xe_costs_bt_%s_%s' % (lang1, lang2)].append(xe_loss.item())
-            self.stats['kld_bt_%s_%s' % (lang1, lang2)].append(kld.cpu().detach().numpy()[0])
+            self.stats['kld_bt_%s_%s' % (lang1, lang2)].append(kld.cpu().detach().tolist())
         else:
             self.stats['xe_costs_%s_%s' % (lang1, lang2)].append(xe_loss.item())
-            self.stats['kld_%s_%s' % (lang1, lang2)].append(kld.cpu().detach().numpy()[0])
+            self.stats['kld_%s_%s' % (lang1, lang2)].append(kld.cpu().detach().tolist())
 
         # discriminator feedback loss
         if params.lambda_dis:
