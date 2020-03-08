@@ -125,6 +125,7 @@ class TrainerMT(MultiprocessingEventLoop):
             self.stats['kld_bt_%s_%s' % (lang1, lang2)] = []
         for lang1, lang2, lang3 in params.pivo_directions:
             self.stats['xe_costs_%s_%s_%s' % (lang1, lang2, lang3)] = []
+            self.stats['kld_%s_%s_%s' % (lang1, lang2, lang3)] = []
         for lang in params.langs:
             self.stats['lme_costs_%s' % lang] = []
             self.stats['lmd_costs_%s' % lang] = []
@@ -487,11 +488,11 @@ class TrainerMT(MultiprocessingEventLoop):
         scores, dec_hiddens = self.decoder(encoded, latent_resampled, sent2[:-1], lang2_id)
 
         # latent space conditioned on both languages
-        if back:
-            mu_lat_joint, var_lat_joint = self.latent_joint(dec_hiddens, encoded.enc_hiddens)
-        else:
+        if lang1_id < lang2_id:
             mu_lat_joint, var_lat_joint = self.latent_joint(encoded.enc_hiddens, dec_hiddens)
-        latent_joint_resampled = self.latent_joint.reparameterize(mu_lat_joint, var_lat_joint)
+        else:
+            logger.info("lang1_id > lang2id!")
+            mu_lat_joint, var_lat_joint = self.latent_joint(dec_hiddens, encoded.enc_hiddens)
 
         # calculate KL divergence loss: KL(p(z|s,t) || q(z|s))
         kld = (0.5 * (var_lat - var_lat_joint) + (torch.exp(var_lat_joint) + (mu_lat_joint - mu_lat)**2) / (2 * torch.exp(var_lat)) - 0.5).sum(dim=-1).mean()
@@ -720,19 +721,32 @@ class TrainerMT(MultiprocessingEventLoop):
             mu_lat, var_lat = self.latent(encoded.enc_hiddens, lang1_id)
             latent_resampled = self.latent.reparameterize(mu_lat, var_lat)
 
-            scores, _ = self.decoder(encoded, latent_resampled, sent2[:-1], lang_id=lang2_id)
+            scores, dec_hiddens = self.decoder(encoded, latent_resampled, sent2[:-1], lang_id=lang2_id)
             assert scores.size() == (len2.max() - 1, bs, n_words2)
+
+            if lang1_id < lang2_id:
+                mu_lat_joint, var_lat_joint = self.latent_joint(encoded.enc_hiddens, dec_hiddens)
+            else:
+                logger.info("lang1_id > lang2id!")
+                mu_lat_joint, var_lat_joint = self.latent_joint(dec_hiddens, encoded.enc_hiddens)
+            # calculate KL divergence loss: KL(p(z|s,t) || q(z|s))
+            kld = (0.5 * (var_lat - var_lat_joint) + (torch.exp(var_lat_joint) + (mu_lat_joint - mu_lat)**2) / (2 * torch.exp(var_lat)) - 0.5).sum(dim=-1).mean()
+
 
             # lang2 -> lang3
             bos = torch.cuda.FloatTensor(1, bs, n_words2).zero_()
             bos[0, :, params.bos_index[lang2_id]] = 1
             sent2_input = torch.cat([bos, F.softmax(scores / backprop_temperature, -1)], 0)
             encoded = self.encoder(sent2_input, len2, lang_id=lang2_id)
+            mu_lat, var_lat = self.latent(encoded.enc_hiddens, lang2_id)
+            latent_resampled = self.latent.reparameterize(mu_lat, var_lat)
+            kld2 = (0.5 * (var_lat - var_lat_joint) + (torch.exp(var_lat_joint) + (mu_lat_joint - mu_lat)**2) / (2 * torch.exp(var_lat)) - 0.5).sum(dim=-1).mean()
 
         # cross-entropy scores / loss
         scores, _ = self.decoder(encoded, latent_resampled, sent3[:-1], lang_id=lang3_id)
         xe_loss = loss_fn(scores.view(-1, n_words3), sent3[1:].view(-1))
         self.stats['xe_costs_%s_%s_%s' % direction].append(xe_loss.item())
+        self.stats['kld_%s_%s_%s' % direction].append(kld.item() + kld2.item())
         assert lambda_xe > 0
         loss = lambda_xe * xe_loss
 
@@ -786,6 +800,7 @@ class TrainerMT(MultiprocessingEventLoop):
                 mean_loss.append(('KLD-BT-%s-%s' % (lang1, lang2), 'kld_bt_%s_%s' % (lang1, lang2)))
             for lang1, lang2, lang3 in self.params.pivo_directions:
                 mean_loss.append(('XE-%s-%s-%s' % (lang1, lang2, lang3), 'xe_costs_%s_%s_%s' % (lang1, lang2, lang3)))
+                mean_loss.append(('KLD-%s-%s-%s' % (lang1, lang2, lang3), 'kld_%s_%s_%s' % (lang1, lang2, lang3)))
             for lang in self.params.langs:
                 mean_loss.append(('LME-%s' % lang, 'lme_costs_%s' % lang))
                 mean_loss.append(('LMD-%s' % lang, 'lmd_costs_%s' % lang))
