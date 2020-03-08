@@ -793,9 +793,9 @@ class TrainerMT(MultiprocessingEventLoop):
                 mean_loss.append(('ENC-L2-%s' % lang, 'enc_norms_%s' % lang))
 
             s_iter = "%7i - " % self.n_iter
-            s_stat = ' || '.join(['{}: {:7.4f}'.format(k, np.mean(self.stats[l]))
-                                 for k, l in mean_loss if len(self.stats[l]) > 0])
-            print(s_stat)
+            # s_stat = ' || '.join(['{}: {:7.4f}'.format(k, np.mean(self.stats[l]))
+            #                      for k, l in mean_loss if len(self.stats[l]) > 0])
+            s_stat = np.mean(self.stats['xe_costs_en_fr'])
             for _, l in mean_loss:
                 del self.stats[l][:]
 
