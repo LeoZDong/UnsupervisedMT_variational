@@ -497,8 +497,6 @@ class TrainerMT(MultiprocessingEventLoop):
         kld = (0.5 * (var_lat - var_lat_joint) + (torch.exp(var_lat_joint) + (mu_lat_joint - mu_lat)**2) / (2 * torch.exp(var_lat)) - 0.5).sum(dim=-1).mean()
 
         xe_loss = loss_fn(scores.view(-1, n_words), sent2[1:].view(-1))
-        logger.info("xe_loss item:")
-        logger.info(xe_loss.item())
         if back:
             self.stats['xe_costs_bt_%s_%s' % (lang1, lang2)].append(xe_loss.item())
             self.stats['kld_bt_%s_%s' % (lang1, lang2)].append(kld)
@@ -774,7 +772,7 @@ class TrainerMT(MultiprocessingEventLoop):
         Print statistics about the training.
         """
         # average loss / statistics
-        if self.n_iter % 10 == 0:
+        if self.n_iter % 1 == 0:
             mean_loss = [
                 ('DIS', 'dis_costs'),
             ]
@@ -795,6 +793,7 @@ class TrainerMT(MultiprocessingEventLoop):
                 mean_loss.append(('ENC-L2-%s' % lang, 'enc_norms_%s' % lang))
 
             s_iter = "%7i - " % self.n_iter
+            logger.info(self.stats)
             s_stat = ' || '.join(['{}: {:7.4f}'.format(k, np.mean(self.stats[l]))
                                  for k, l in mean_loss if len(self.stats[l]) > 0])
             for _, l in mean_loss:
