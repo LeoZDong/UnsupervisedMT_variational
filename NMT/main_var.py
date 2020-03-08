@@ -333,6 +333,10 @@ def main(params):
                     lang1, lang2, lang3 = batch['lang1'], batch['lang2'], batch['lang3']
                     # 2-lang back-translation - autoencoding
                     if lang1 != lang2 == lang3:
+                        logger.info("autoencoding:")
+                        logger.info(lang1)
+                        logger.info(lang2)
+                        logger.info(lang3)
                         trainer.otf_bt(batch, params.lambda_xe_otfa, params.otf_backprop_temperature)
                     # 2-lang back-translation - parallel data
                     elif lang1 == lang3 != lang2:

@@ -491,7 +491,6 @@ class TrainerMT(MultiprocessingEventLoop):
         if lang1_id < lang2_id:
             mu_lat_joint, var_lat_joint = self.latent_joint(encoded.enc_hiddens, dec_hiddens)
         else:
-            logger.info("lang1_id > lang2id!")
             mu_lat_joint, var_lat_joint = self.latent_joint(dec_hiddens, encoded.enc_hiddens)
 
         # calculate KL divergence loss: KL(p(z|s,t) || q(z|s))
@@ -742,21 +741,22 @@ class TrainerMT(MultiprocessingEventLoop):
 
         # cross-entropy scores / loss
         scores, dec_hiddens = self.decoder(encoded, latent_resampled, sent3[:-1], lang_id=lang3_id)
-        if lang1_id < lang2_id:
-            mu_lat_joint, var_lat_joint = self.latent_joint(encoded.enc_hiddens, dec_hiddens)
+
+        if backprop_temperature == -1:
+            if lang1_id < lang2_id:
+                mu_lat_joint, var_lat_joint = self.latent_joint(encoded.enc_hiddens, dec_hiddens)
+            else:
+                mu_lat_joint, var_lat_joint = self.latent_joint(dec_hiddens, encoded.enc_hiddens)
+            # calculate KL divergence loss: KL(p(z|s,t) || q(z|s))
+            kld = (0.5 * (var_lat - var_lat_joint) + (torch.exp(var_lat_joint) + (mu_lat_joint - mu_lat)**2) / (2 * torch.exp(var_lat)) - 0.5).sum(dim=-1).mean()
         else:
-            mu_lat_joint, var_lat_joint = self.latent_joint(dec_hiddens, encoded.enc_hiddens)
-        # calculate KL divergence loss: KL(p(z|s,t) || q(z|s))
-        kld = (0.5 * (var_lat - var_lat_joint) + (torch.exp(var_lat_joint) + (mu_lat_joint - mu_lat)**2) / (2 * torch.exp(var_lat)) - 0.5).sum(dim=-1).mean()
+            kld = kld1 + kld2
 
         xe_loss = loss_fn(scores.view(-1, n_words3), sent3[1:].view(-1))
         self.stats['xe_costs_%s_%s_%s' % direction].append(xe_loss.item())
-        if backprop_temperature == -1:
-            self.stats['kld_%s_%s_%s' % direction].append(kld.item())
-        else:
-            self.stats['kld_%s_%s_%s' % direction].append(kld1.item() + kld2.item())
+        self.stats['kld_%s_%s_%s' % direction].append(kld.item())
         assert lambda_xe > 0
-        loss = lambda_xe * xe_loss
+        loss = lambda_xe * xe_loss + kld
 
         # check NaN
         if (loss != loss).data.any():
