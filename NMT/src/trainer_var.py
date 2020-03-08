@@ -118,8 +118,10 @@ class TrainerMT(MultiprocessingEventLoop):
             self.stats['xe_costs_%s_%s' % (lang, lang)] = []
         for lang1, lang2 in params.para_directions:
             self.stats['xe_costs_%s_%s' % (lang1, lang2)] = []
+            self.stats['kld_%s_%s' % (lang1, lang2)] = []
         for lang1, lang2 in params.back_directions:
             self.stats['xe_costs_bt_%s_%s' % (lang1, lang2)] = []
+            self.stats['kld_bt_%s_%s' % (lang1, lang2)] = []
         for lang1, lang2, lang3 in params.pivo_directions:
             self.stats['xe_costs_%s_%s_%s' % (lang1, lang2, lang3)] = []
         for lang in params.langs:
