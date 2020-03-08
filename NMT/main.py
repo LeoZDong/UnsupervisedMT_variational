@@ -239,6 +239,8 @@ def get_parser():
                         help="Beam width (<= 0 means greedy)")
     parser.add_argument("--length_penalty", type=float, default=1.0,
                         help="Length penalty: <1.0 favors shorter, >1.0 favors longer sentences")
+    parse.add_argument("--mono_only", type=bool_flag, default=False,
+                        help="Load monolingual data only")
     return parser
 
 
@@ -250,7 +252,8 @@ def main(params):
 
     # initialize experiment / load data / build model
     logger = initialize_exp(params)
-    data = load_data(params)
+    # data = load_data(params)
+    data = load_data(params, mono_only=params.mono_only)
     encoder, decoder, discriminator, lm = build_mt_model(params, data)
 
     # initialize trainer / reload checkpoint / initialize evaluator
