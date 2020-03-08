@@ -16,10 +16,6 @@ from src.trainer_var import TrainerMT
 from src.evaluator_var import EvaluatorMT
 import torch
 
-import logging
-open('run_var.txt', 'w').close()
-logging.basicConfig(filename='run_var.txt',level=logging.DEBUG)
-
 def get_parser():
     # parse parameters
     parser = argparse.ArgumentParser(description='Language transfer')
@@ -239,6 +235,8 @@ def get_parser():
                         help="Beam width (<= 0 means greedy)")
     parser.add_argument("--length_penalty", type=float, default=1.0,
                         help="Length penalty: <1.0 favors shorter, >1.0 favors longer sentences")
+    parser.add_argument("--mono_only", type=bool_flag, default=False,
+                        help="Load monolingual data only")
     return parser
 
 
@@ -250,7 +248,8 @@ def main(params):
 
     # initialize experiment / load data / build model
     logger = initialize_exp(params)
-    data = load_data(params)
+    # data = load_data(params)
+    data = load_data(params, mono_only=params.mono_only)
     encoder, decoder, latent, latent_joint, discriminator, lm = build_mt_model(params, data)
 
     # initialize trainer / reload checkpoint / initialize evaluator
@@ -359,6 +358,7 @@ def main(params):
         # trainer.save_best_model(scores)
         # trainer.save_periodic()
         # trainer.end_epoch(scores)
+        trainer.end_epoch(1)
         # trainer.test_sharing()
 
 

@@ -16,9 +16,6 @@ from src.trainer import TrainerMT
 from src.evaluator import EvaluatorMT
 import torch
 
-import logging
-open('run_base.txt', 'w').close()
-logging.basicConfig(filename='run_base.txt',level=logging.INFO)
 
 def get_parser():
     # parse parameters
