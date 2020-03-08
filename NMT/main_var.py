@@ -366,7 +366,7 @@ def main(params):
             # trainer.end_epoch(0)
             trainer.test_sharing()
         else:
-            trainer.end_epoch(0)
+            trainer.end_epoch(0, skip=True)
 
 
 if __name__ == '__main__':

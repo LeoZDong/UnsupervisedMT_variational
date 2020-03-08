@@ -946,12 +946,12 @@ class TrainerMT(MultiprocessingEventLoop):
         if self.params.save_periodic and self.epoch % 20 == 0 and self.epoch > 0:
             self.save_model('periodic-%i' % self.epoch)
 
-    def end_epoch(self, scores):
+    def end_epoch(self, scores, skip=False):
         """
         End the epoch.
         """
         # stop if the stopping criterion has not improved after a certain number of epochs
-        if self.stopping_criterion is not None:
+        if !skip and self.stopping_criterion is not None:
             assert self.stopping_criterion in scores
             if scores[self.stopping_criterion] > self.best_stopping_criterion:
                 self.best_stopping_criterion = scores[self.stopping_criterion]
