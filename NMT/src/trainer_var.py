@@ -772,7 +772,7 @@ class TrainerMT(MultiprocessingEventLoop):
         Print statistics about the training.
         """
         # average loss / statistics
-        if self.n_iter % 1 == 0:
+        if self.n_iter % 10 == 0:
             mean_loss = [
                 ('DIS', 'dis_costs'),
             ]
@@ -793,7 +793,7 @@ class TrainerMT(MultiprocessingEventLoop):
                 mean_loss.append(('ENC-L2-%s' % lang, 'enc_norms_%s' % lang))
 
             s_iter = "%7i - " % self.n_iter
-            logger.info(self.stats)
+            # logger.info(self.stats)
             s_stat = ' || '.join(['{}: {:7.4f}'.format(k, np.mean(self.stats[l]))
                                  for k, l in mean_loss if len(self.stats[l]) > 0])
             for _, l in mean_loss:
