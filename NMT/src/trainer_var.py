@@ -951,7 +951,7 @@ class TrainerMT(MultiprocessingEventLoop):
         End the epoch.
         """
         # stop if the stopping criterion has not improved after a certain number of epochs
-        if !skip and self.stopping_criterion is not None:
+        if not skip and self.stopping_criterion is not None:
             assert self.stopping_criterion in scores
             if scores[self.stopping_criterion] > self.best_stopping_criterion:
                 self.best_stopping_criterion = scores[self.stopping_criterion]
