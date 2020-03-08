@@ -251,6 +251,8 @@ def main(params):
     logger = initialize_exp(params)
     # data = load_data(params)
     data = load_data(params, mono_only=params.mono_only)
+    logger.info("data dico:")
+    logger.info(data['dico'])
     encoder, decoder, discriminator, lm = build_mt_model(params, data)
 
     # initialize trainer / reload checkpoint / initialize evaluator
