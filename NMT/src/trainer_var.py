@@ -498,7 +498,7 @@ class TrainerMT(MultiprocessingEventLoop):
             self.stats['xe_costs_bt_%s_%s' % (lang1, lang2)].append(xe_loss.item())
             self.stats['kld_bt_%s_%s' % (lang1, lang2)].append(kld)
         else:
-            self.stats['xe_costs_%s _%s' % (lang1, lang2)].append(xe_loss.item())
+            self.stats['xe_costs_%s_%s' % (lang1, lang2)].append(xe_loss.item())
             self.stats['kld_%s_%s' % (lang1, lang2)].append(kld)
 
         # discriminator feedback loss
