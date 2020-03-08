@@ -333,6 +333,8 @@ def check_all_data_params(params):
     assert all(len(k.split('-')) == 2 for k in params.para_dataset.keys())
     assert all(len(v.split(',')) == 3 for v in params.para_dataset.values())
     params.para_dataset = {tuple(k.split('-')): tuple(v.split(',')) for k, v in params.para_dataset.items()}
+    logger.info("n para")
+    logger.info(params.n_para)
     assert not (params.n_para == 0) ^ (all(v[0] == '' for v in params.para_dataset.values()))
     for (lang1, lang2), (train_path, valid_path, test_path) in params.para_dataset.items():
         assert lang1 < lang2 and lang1 in params.langs and lang2 in params.langs
