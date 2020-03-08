@@ -794,7 +794,7 @@ class TrainerMT(MultiprocessingEventLoop):
         Print statistics about the training.
         """
         # average loss / statistics
-        if self.n_iter % 10 == 0:
+        if self.n_iter % 50 == 0:
             mean_loss = [
                 ('DIS', 'dis_costs'),
             ]
