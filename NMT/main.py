@@ -349,7 +349,7 @@ def main(params):
         # end of epoch
         logger.info("====================== End of epoch %i ======================" % trainer.epoch)
 
-        if trainer.epoch >= 100:
+        if trainer.epoch >= 25:
             # evaluate discriminator / perplexity / BLEU
             scores = evaluator.run_all_evals(trainer.epoch)
 
