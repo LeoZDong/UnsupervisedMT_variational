@@ -57,7 +57,7 @@ def reload_txt_emb(path, dim):
                 assert vect.shape == (dim,), i
                 word2id[word] = len(word2id)
                 vectors.append(vect[None])
-        # assert len(vectors) == n_words
+        assert len(vectors) == n_words
 
     vectors = np.concatenate(vectors, 0)
     assert vectors.shape == (n_words, dim)
