@@ -42,7 +42,6 @@ def reload_txt_emb(path, dim):
     # load pretrained embeddings
     with open(path, encoding='UTF-8') as f:
         for i, line in enumerate(f):
-            print("hi!!!")
             if i == 0:
                 split = line.split()
                 assert len(split) == 2
