@@ -313,7 +313,8 @@ def get_mask(lengths, all_words, expand=None, ignore_first=False, batch_first=Fa
     Create a mask of shape (slen, bs) or (bs, slen).
     """
     bs, slen = lengths.size(0), lengths.max()
-    mask = torch.BoolTensor(slen, bs).zero_()
+    # mask = torch.BoolTensor(slen, bs).zero_()
+    mask = torch.BoolTensor(slen, bs).fill_(False)
     for i in range(bs):
         if all_words:
             # mask[:lengths[i], i] = 1
@@ -325,7 +326,8 @@ def get_mask(lengths, all_words, expand=None, ignore_first=False, batch_first=Fa
         assert type(expand) is int
         mask = mask.unsqueeze(2).expand(slen, bs, expand)
     if ignore_first:
-        mask[0].fill_(0)
+        # mask[0].fill_(0)
+        mask[0].fill_(False)
     if batch_first:
         mask = mask.transpose(0, 1)
     if cuda:
