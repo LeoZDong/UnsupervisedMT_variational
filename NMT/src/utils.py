@@ -316,9 +316,11 @@ def get_mask(lengths, all_words, expand=None, ignore_first=False, batch_first=Fa
     mask = torch.BoolTensor(slen, bs).zero_()
     for i in range(bs):
         if all_words:
-            mask[:lengths[i], i] = 1
+            # mask[:lengths[i], i] = 1
+            mask[:lengths[i], i] = True
         else:
-            mask[lengths[i] - 1, i] = 1
+            # mask[lengths[i] - 1, i] = 1
+            mask[lengths[i] - 1, i] = True
     if expand is not None:
         assert type(expand) is int
         mask = mask.unsqueeze(2).expand(slen, bs, expand)
