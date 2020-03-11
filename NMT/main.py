@@ -301,18 +301,19 @@ def main(params):
             if params.lambda_xe_para > 0:
                 for lang1, lang2 in params.para_directions:
                     trainer.enc_dec_step(lang1, lang2, params.lambda_xe_para)
-            # torch.cuda.empty_cache()
+            torch.cuda.empty_cache()
 
             # MT training (back-parallel data)
             if params.lambda_xe_back > 0:
                 for lang1, lang2 in params.back_directions:
                     trainer.enc_dec_step(lang1, lang2, params.lambda_xe_back, back=True)
-            # torch.cuda.empty_cache()
+            torch.cuda.empty_cache()
 
             # autoencoder training (monolingual data)
             if params.lambda_xe_mono > 0:
                 for lang in params.mono_directions:
                     trainer.enc_dec_step(lang, lang, params.lambda_xe_mono)
+            torch.cuda.empty_cache()
 
             # AE - MT training (on the fly back-translation)
             if params.lambda_xe_otfd > 0 or params.lambda_xe_otfa > 0:
@@ -344,6 +345,7 @@ def main(params):
                     elif lang1 != lang2 and lang2 != lang3 and lang1 != lang3:
                         trainer.otf_bt(batch, params.lambda_xe_otfd, params.otf_backprop_temperature)
 
+            torch.cuda.empty_cache()
             trainer.iter()
 
         # end of epoch
