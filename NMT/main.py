@@ -347,6 +347,7 @@ def main(params):
                     torch.cuda.empty_cache()
             torch.cuda.empty_cache()
             trainer.iter()
+            torch.cuda.empty_cache()
 
         # end of epoch
         logger.info("====================== End of epoch %i ======================" % trainer.epoch)
