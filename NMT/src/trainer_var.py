@@ -743,7 +743,7 @@ class TrainerMT(MultiprocessingEventLoop):
         scores, dec_hiddens = self.decoder(encoded, latent_resampled, sent3[:-1], lang_id=lang3_id)
 
         if backprop_temperature == -1:
-            if lang1_id < lang2_id:
+            if lang2_id < lang3_id:
                 mu_lat_joint, var_lat_joint = self.latent_joint(encoded.enc_hiddens, dec_hiddens)
             else:
                 mu_lat_joint, var_lat_joint = self.latent_joint(dec_hiddens, encoded.enc_hiddens)
