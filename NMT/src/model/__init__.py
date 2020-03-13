@@ -95,7 +95,7 @@ def build_mt_model(params, data, cuda=True):
     """
     Build machine translation model.
     """
-    if params.variation:
+    if params.variational:
         if params.attention:
             logger.info("Building variational seq2seq with attention")
             from .attention_var import build_attention_model
