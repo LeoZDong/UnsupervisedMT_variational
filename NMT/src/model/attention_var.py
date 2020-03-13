@@ -787,7 +787,7 @@ class Latent(nn.Module):
 
     def forward(self, enc_hiddens, input_len, lang_id):
         # (bs, hidden_dim)
-        enc_hiddens_mean = torch.sum(enc_hiddens, dim=0) / torch.tensor(input_len, dtype=torch.float, device=torch.cuda)[:, None]
+        enc_hiddens_mean = torch.sum(enc_hiddens, dim=0) / torch.tensor(input_len, dtype=torch.float, device=torch.cuda.current_device())[:, None]
 
         mu_layer = self.mu[lang_id]
         mu = mu_layer(enc_hiddens_mean) # (bs, latent_dim)
