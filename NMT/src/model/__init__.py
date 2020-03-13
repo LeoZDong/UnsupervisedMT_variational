@@ -7,7 +7,9 @@
 
 import os
 from collections import namedtuple
+from logging import getLogger
 
+logger = getLogger()
 
 LSTM_PARAMS = ['weight_ih_l%i', 'weight_hh_l%i', 'bias_ih_l%i', 'bias_hh_l%i']
 BILSTM_PARAMS = LSTM_PARAMS + ['%s_reverse' % x for x in LSTM_PARAMS]
@@ -93,14 +95,21 @@ def build_mt_model(params, data, cuda=True):
     """
     Build machine translation model.
     """
-    if params.attention:
-        from .attention import build_attention_model
-        return build_attention_model(params, data, cuda=cuda)
-    elif params.variational:
-        print("Building variational seq2seq!")
-        from .seq2seq_var import build_seq2seq_model
-        return build_seq2seq_model(params, data, cuda=cuda)
+    if params.variation:
+        if params.attention:
+            logger.info("Building variational seq2seq with attention")
+            from .attention_var import build_attention_model
+            return build_attention_model(params, data, cuda=cuda)
+        else:
+            logger.info("Building variational seq2seq")
+            from .seq2seq_var import build_seq2seq_model
+            return build_seq2seq_model(params, data, cuda=cuda)
     else:
-        print("building regular seq2seq!")
-        from .seq2seq import build_seq2seq_model
-        return build_seq2seq_model(params, data, cuda=cuda)
+        if params.attention:
+            logger.info("Building regular seq2seq with attention")
+            from .attention import build_attention_model
+            return build_attention_model(params, data, cuda=cuda)
+        else:
+            logger.info("Building regular seq2seq")
+            from .seq2seq import build_seq2seq_model
+            return build_seq2seq_model(params, data, cuda=cuda)

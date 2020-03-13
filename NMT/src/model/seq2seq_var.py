@@ -216,7 +216,7 @@ class Decoder(nn.Module):
         self.embeddings = embeddings
 
         # LSTM layers / shared layers
-        input_dim = self.emb_dim + (0 if self.init_encoded else self.enc_dim) + self.hidden_dim
+        input_dim = self.emb_dim + (0 if self.init_encoded else self.enc_dim) + self.latent_dim
         lstm = [
             nn.LSTM(input_dim, self.hidden_dim, num_layers=self.n_dec_layers, dropout=self.dropout)
             for _ in range(self.n_langs)
