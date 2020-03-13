@@ -130,7 +130,7 @@ class Encoder(nn.Module):
         # get a padded version of the LSTM output
         padded_output, _ = pad_packed_sequence(lstm_output)
         assert padded_output.size() == (slen, bs, 2 * self.hidden_dim)
-        enc_hiddens = pack_padded_sequence(padded_output, sorted(lengths.tolist(), reverse=True)).index_select(1, sort_len_rev)
+        enc_hiddens = padded_output.index_select(1, sort_len_rev)
 
         # project biLSTM output
         padded_output = proj_layer(padded_output.view(slen * bs, -1)).view(slen, bs, self.emb_dim)
