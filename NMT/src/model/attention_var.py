@@ -130,6 +130,7 @@ class Encoder(nn.Module):
         # get a padded version of the LSTM output
         padded_output, _ = pad_packed_sequence(lstm_output)
         assert padded_output.size() == (slen, bs, 2 * self.hidden_dim)
+        enc_hiddens = padded_output.index_select(1, sort_len_rev)
 
         # project biLSTM output
         padded_output = proj_layer(padded_output.view(slen * bs, -1)).view(slen, bs, self.emb_dim)
@@ -143,7 +144,7 @@ class Encoder(nn.Module):
             mask = get_mask(lengths, all_words=True, expand=self.emb_dim, batch_first=False, cuda=is_cuda)
             dis_input = padded_output.masked_select(mask).view(lengths.sum(), self.emb_dim)
 
-        return LatentState(input_len=lengths, dec_input=padded_output, dis_input=dis_input, enc_hiddens=lstm_output.data)
+        return LatentState(input_len=lengths, dec_input=padded_output, dis_input=dis_input, enc_hiddens=enc_hiddens)
 
 
 class Decoder(nn.Module):
@@ -382,7 +383,7 @@ class Decoder(nn.Module):
                 # lstm step
                 # latent_resampled_reshaped = latent_resampled.unsqueeze(0).expand(y_len, bs, self.latent_dim)
                 lstm_input = embeddings[i:i + 1] # I think it is: (1, bs, embed_dim)
-                latent_resampled_reshaped = latent_resampled.unsqueeze(0)
+                latent_resampled_reshaped = latent_resampled.expand(bs, self.latent_dim)
                 logger.info("lstm_input size:{}".format(lstm_input.size()))
                 logger.info("attention size:{}".format(attention.size()))
                 logger.info("latent resampled size:{}".format(latent_resampled.size()))
