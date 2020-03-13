@@ -842,7 +842,6 @@ class LatentJoint(nn.Module):
         # logger.info("lang1_hiddens size:{}".format(lang1_hiddens.size()))
         # logger.info("lang2_hiddens size:{}".format(lang2_hiddens.size()))
 
-
         mu = self.mu(lang_joint_hiddens) # (bs, latent_dim)
         var = self.var(lang_joint_hiddens) # (bs, latent_dim)
         return mu, var
