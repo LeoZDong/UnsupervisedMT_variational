@@ -787,8 +787,8 @@ class Latent(nn.Module):
 
     def forward(self, enc_hiddens, input_len, lang_id):
         # (bs, hidden_dim)
-        enc_hiddens_mean = torch.sum(enc_hiddens, dim=0) / torch.tensor(lengths)[:, None]
-        
+        enc_hiddens_mean = torch.sum(enc_hiddens, dim=0) / torch.tensor(input_len)[:, None]
+
         mu_layer = self.mu[lang_id]
         mu = mu_layer(enc_hiddens_mean) # (bs, latent_dim)
         var_layer = self.var[lang_id]
