@@ -812,8 +812,8 @@ class LatentJoint(nn.Module):
         self.latent_dim = params.latent_dim
         self.hidden_dim = params.hidden_dim
         self.latent_dim = params.latent_dim
-        self.mu = nn.Linear(self.hidden_dim * 4, self.latent_dim)
-        self.var = nn.Linear(self.hidden_dim * 4, self.latent_dim)
+        self.mu = nn.Linear(self.hidden_dim * 3, self.latent_dim)
+        self.var = nn.Linear(self.hidden_dim * 3, self.latent_dim)
 
     def reparameterize(self, mu, logvar):
         """ Resample from the latent space distribution, specified by mu and logvar.
