@@ -347,6 +347,7 @@ def main(params):
                     # 3-lang back-translation - parallel data
                     elif lang1 != lang2 and lang2 != lang3 and lang1 != lang3:
                         trainer.otf_bt(batch, params.lambda_xe_otfd, params.otf_backprop_temperature)
+                    torch.cuda.empty_cache()
             torch.cuda.empty_cache()
             trainer.iter()
             torch.cuda.empty_cache()
