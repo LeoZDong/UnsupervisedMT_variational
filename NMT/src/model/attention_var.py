@@ -143,7 +143,7 @@ class Encoder(nn.Module):
             mask = get_mask(lengths, all_words=True, expand=self.emb_dim, batch_first=False, cuda=is_cuda)
             dis_input = padded_output.masked_select(mask).view(lengths.sum(), self.emb_dim)
 
-        return LatentState(input_len=lengths, dec_input=padded_output, dis_input=dis_input, enc_hiddens=lstm_output)
+        return LatentState(input_len=lengths, dec_input=padded_output, dis_input=dis_input, enc_hiddens=lstm_output.data)
 
 
 class Decoder(nn.Module):
@@ -426,7 +426,7 @@ class Decoder(nn.Module):
         if lstm_proj_layer is not None:
             output = F.relu(lstm_proj_layer(output))
         scores = proj_layer(output)
-        return scores.view(y_len, bs, n_words)
+        return scores.view(y_len, bs, n_words), lstm_output
 
     def generate(self, encoded, latent_resampled, lang_id, max_len=200, sample=False, temperature=None):
         """
