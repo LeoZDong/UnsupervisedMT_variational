@@ -130,7 +130,7 @@ class Encoder(nn.Module):
         # get a padded version of the LSTM output
         padded_output, _ = pad_packed_sequence(lstm_output)
         assert padded_output.size() == (slen, bs, 2 * self.hidden_dim)
-        enc_hiddens = padded_output.index_select(1, sort_len_rev)
+        # enc_hiddens = padded_output.index_select(1, sort_len_rev)
 
         # project biLSTM output
         padded_output = proj_layer(padded_output.view(slen * bs, -1)).view(slen, bs, self.emb_dim)
@@ -144,7 +144,7 @@ class Encoder(nn.Module):
             mask = get_mask(lengths, all_words=True, expand=self.emb_dim, batch_first=False, cuda=is_cuda)
             dis_input = padded_output.masked_select(mask).view(lengths.sum(), self.emb_dim)
 
-        return LatentState(input_len=lengths, dec_input=padded_output, dis_input=dis_input, enc_hiddens=enc_hiddens)
+        return LatentState(input_len=lengths, dec_input=padded_output, dis_input=dis_input, enc_hiddens=lstm_output, order=sort_len_rev)
 
 
 class Decoder(nn.Module):
@@ -785,9 +785,12 @@ class Latent(nn.Module):
             # current input. This is close to randomly sample from the distribution.
             return mu
 
-    def forward(self, enc_hiddens, input_len, lang_id):
+    def forward(self, enc_hiddens, order, lang_id):
         # (bs, hidden_dim)
-        enc_hiddens_mean = torch.sum(enc_hiddens, dim=0) / torch.tensor(input_len, dtype=torch.float, device=torch.cuda.current_device())[:, None]
+        enc_hiddens_padded, lengths = pad_packed_sequence(enc_hiddens)
+        enc_hiddens_mean = torch.sum(enc_hiddens_padded, dim=0) / lengths[:, None]
+        enc_hiddens_mean = enc_hiddens_mean.index_select(0, order)
+        # enc_hiddens_mean = torch.sum(enc_hiddens, dim=0) / torch.tensor(input_len, dtype=torch.float, device=torch.cuda.current_device())[:, None]
 
         mu_layer = self.mu[lang_id]
         mu = mu_layer(enc_hiddens_mean) # (bs, latent_dim)
