@@ -751,8 +751,9 @@ class Latent(nn.Module):
         self.latent_dim = params.latent_dim
         self.hidden_dim = params.hidden_dim
         self.n_langs = params.n_langs
-        mu = [nn.Linear(self.hidden_dim, self.latent_dim) for _ in range(self.n_langs)]
-        var = [nn.Linear(self.hidden_dim, self.latent_dim) for _ in range(self.n_langs)]
+        # multiply hidden_dim by 2 because bi-directional LSTM
+        mu = [nn.Linear(self.hidden_dim * 2, self.latent_dim) for _ in range(self.n_langs)]
+        var = [nn.Linear(self.hidden_dim * 2, self.latent_dim) for _ in range(self.n_langs)]
         self.mu = nn.ModuleList(mu)
         self.var = nn.ModuleList(var)
 
@@ -806,8 +807,8 @@ class LatentJoint(nn.Module):
         self.latent_dim = params.latent_dim
         self.hidden_dim = params.hidden_dim
         self.latent_dim = params.latent_dim
-        self.mu = nn.Linear(self.hidden_dim * 2, self.latent_dim)
-        self.var = nn.Linear(self.hidden_dim * 2, self.latent_dim)
+        self.mu = nn.Linear(self.hidden_dim * 4, self.latent_dim)
+        self.var = nn.Linear(self.hidden_dim * 4, self.latent_dim)
 
     def reparameterize(self, mu, logvar):
         """ Resample from the latent space distribution, specified by mu and logvar.
