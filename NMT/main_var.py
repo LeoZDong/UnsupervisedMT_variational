@@ -281,6 +281,7 @@ def main(params):
     for _ in range(trainer.epoch, params.max_epoch):
 
         logger.info("====================== Starting epoch %i ... ======================" % trainer.epoch)
+        torch.cuda.empty_cache()
 
         trainer.n_sentences = 0
 
@@ -355,23 +356,21 @@ def main(params):
         # end of epoch
         logger.info("====================== End of epoch %i ======================" % trainer.epoch)
 
-        if trainer.epoch > 0:
-            # evaluate discriminator / perplexity / BLEU
-            scores = evaluator.run_all_evals(trainer.epoch)
+        # evaluate discriminator / perplexity / BLEU
+        scores = evaluator.run_all_evals(trainer.epoch)
 
-            # print / JSON log
-            for k, v in scores.items():
-                logger.info('%s -> %.6f' % (k, v))
-            logger.info("__log__:%s" % json.dumps(scores))
+        # print / JSON log
+        for k, v in scores.items():
+            logger.info('%s -> %.6f' % (k, v))
+        logger.info("__log__:%s" % json.dumps(scores))
 
-            # save best / save periodic / end epoch
-            trainer.save_best_model(scores)
-            trainer.save_periodic()
-            trainer.end_epoch(scores)
-            # trainer.end_epoch(0)
-            trainer.test_sharing()
-        else:
-            trainer.end_epoch(0, skip=True)
+        # save best / save periodic / end epoch
+        trainer.save_best_model(scores)
+        trainer.save_periodic()
+        trainer.end_epoch(scores)
+        trainer.test_sharing()
+
+
 
 
 if __name__ == '__main__':
