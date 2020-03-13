@@ -839,8 +839,8 @@ class LatentJoint(nn.Module):
         lang2_hiddens_mean = torch.mean(lang2_hiddens, dim=0) # (bs, hidden_dim)
         lang_joint_hiddens = torch.cat((lang1_hiddens_mean, lang2_hiddens_mean), dim=1) # (bs, hidden_dim * 2)
 
-        logger.info("lang1_hiddens size:{}".format(lang1_hiddens.size()))
-        logger.info("lang2_hiddens size:{}".format(lang2_hiddens.size()))
+        # logger.info("lang1_hiddens size:{}".format(lang1_hiddens.size()))
+        # logger.info("lang2_hiddens size:{}".format(lang2_hiddens.size()))
 
 
         mu = self.mu(lang_joint_hiddens) # (bs, latent_dim)
