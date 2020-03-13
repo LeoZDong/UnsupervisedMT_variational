@@ -788,6 +788,7 @@ class Latent(nn.Module):
     def forward(self, enc_hiddens, order, lang_id):
         # (bs, hidden_dim)
         enc_hiddens_padded, lengths = pad_packed_sequence(enc_hiddens)
+        lengths = lengths.cuda().to(torch.float)
         enc_hiddens_mean = torch.sum(enc_hiddens_padded, dim=0) / lengths[:, None]
         enc_hiddens_mean = enc_hiddens_mean.index_select(0, order)
         # enc_hiddens_mean = torch.sum(enc_hiddens, dim=0) / torch.tensor(input_len, dtype=torch.float, device=torch.cuda.current_device())[:, None]
