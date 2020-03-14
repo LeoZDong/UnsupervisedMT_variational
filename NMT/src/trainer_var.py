@@ -661,7 +661,7 @@ class TrainerMT(MultiprocessingEventLoop):
                 # lang1 -> lang2
                 encoded = self.encoder(sent1, len1, lang_id=lang1_id)
                 # latent space conditioned on one language
-                mu_lat, var_lat = self.latent(encoded.enc_hiddens, len1, lang1_id)
+                mu_lat, var_lat = self.latent(encoded.enc_hiddens, len1.cuda(), lang1_id)
                 latent_resampled = self.latent.reparameterize(mu_lat, var_lat)
 
                 max_len = int(1.5 * len1.max() + 10)
@@ -712,12 +712,12 @@ class TrainerMT(MultiprocessingEventLoop):
         if backprop_temperature == -1:
             # lang2 -> lang3
             encoded = self.encoder(sent2, len2, lang_id=lang2_id)
-            mu_lat, var_lat = self.latent(encoded.enc_hiddens, len2, lang2_id)
+            mu_lat, var_lat = self.latent(encoded.enc_hiddens, len2.cuda(), lang2_id)
             latent_resampled = self.latent.reparameterize(mu_lat, var_lat)
         else:
             # lang1 -> lang2
             encoded = self.encoder(sent1, len1, lang_id=lang1_id)
-            mu_lat, var_lat = self.latent(encoded.enc_hiddens, len1, lang1_id)
+            mu_lat, var_lat = self.latent(encoded.enc_hiddens, len1.cuda(), lang1_id)
             latent_resampled = self.latent.reparameterize(mu_lat, var_lat)
 
             scores, dec_hiddens = self.decoder(encoded, latent_resampled, sent2[:-1], lang_id=lang2_id)
@@ -735,7 +735,7 @@ class TrainerMT(MultiprocessingEventLoop):
             bos[0, :, params.bos_index[lang2_id]] = 1
             sent2_input = torch.cat([bos, F.softmax(scores / backprop_temperature, -1)], 0)
             encoded = self.encoder(sent2_input, len2, lang_id=lang2_id)
-            mu_lat, var_lat = self.latent(encoded.enc_hiddens, len2, lang2_id)
+            mu_lat, var_lat = self.latent(encoded.enc_hiddens, len2.cuda(), lang2_id)
             latent_resampled = self.latent.reparameterize(mu_lat, var_lat)
             kld2 = (0.5 * (var_lat - var_lat_joint) + (torch.exp(var_lat_joint) + (mu_lat_joint - mu_lat)**2) / (2 * torch.exp(var_lat)) - 0.5).sum(dim=-1).mean()
 
