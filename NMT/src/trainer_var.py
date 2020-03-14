@@ -481,7 +481,7 @@ class TrainerMT(MultiprocessingEventLoop):
         self.stats['enc_norms_%s' % lang1].append(encoded.dis_input.data.norm(2, 1).mean().item())
 
         # latent space conditioned on one language
-        mu_lat, var_lat = self.latent(encoded.enc_hiddens, len1, lang1_id)
+        mu_lat, var_lat = self.latent(encoded.enc_hiddens, len1.cuda(), lang1_id)
         latent_resampled = self.latent.reparameterize(mu_lat, var_lat)
 
         # cross-entropy scores / loss
