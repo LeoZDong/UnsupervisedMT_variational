@@ -481,7 +481,7 @@ class TrainerMT(MultiprocessingEventLoop):
         self.stats['enc_norms_%s' % lang1].append(encoded.dis_input.data.norm(2, 1).mean().item())
 
         # latent space conditioned on one language
-        mu_lat, var_lat = self.latent(encoded.enc_hiddens, lang1_id)
+        mu_lat, var_lat = self.latent(encoded.enc_hiddens, len1, lang1_id)
         latent_resampled = self.latent.reparameterize(mu_lat, var_lat)
 
         # cross-entropy scores / loss
@@ -489,9 +489,9 @@ class TrainerMT(MultiprocessingEventLoop):
 
         # latent space conditioned on both languages
         if lang1_id < lang2_id:
-            mu_lat_joint, var_lat_joint = self.latent_joint(encoded.enc_hiddens, dec_hiddens)
+            mu_lat_joint, var_lat_joint = self.latent_joint(encoded.enc_hiddens, dec_hiddens, len1, len2)
         else:
-            mu_lat_joint, var_lat_joint = self.latent_joint(dec_hiddens, encoded.enc_hiddens)
+            mu_lat_joint, var_lat_joint = self.latent_joint(dec_hiddens, encoded.enc_hiddens, len2, len1)
 
         # calculate KL divergence loss: KL(p(z|s,t) || q(z|s))
         kld = (0.5 * (var_lat - var_lat_joint) + (torch.exp(var_lat_joint) + (mu_lat_joint - mu_lat)**2) / (2 * torch.exp(var_lat)) - 0.5).sum(dim=-1).mean()
@@ -661,7 +661,7 @@ class TrainerMT(MultiprocessingEventLoop):
                 # lang1 -> lang2
                 encoded = self.encoder(sent1, len1, lang_id=lang1_id)
                 # latent space conditioned on one language
-                mu_lat, var_lat = self.latent(encoded.enc_hiddens, lang1_id)
+                mu_lat, var_lat = self.latent(encoded.enc_hiddens, len1, lang1_id)
                 latent_resampled = self.latent.reparameterize(mu_lat, var_lat)
 
                 max_len = int(1.5 * len1.max() + 10)
@@ -712,21 +712,21 @@ class TrainerMT(MultiprocessingEventLoop):
         if backprop_temperature == -1:
             # lang2 -> lang3
             encoded = self.encoder(sent2, len2, lang_id=lang2_id)
-            mu_lat, var_lat = self.latent(encoded.enc_hiddens, lang2_id)
+            mu_lat, var_lat = self.latent(encoded.enc_hiddens, len2, lang2_id)
             latent_resampled = self.latent.reparameterize(mu_lat, var_lat)
         else:
             # lang1 -> lang2
             encoded = self.encoder(sent1, len1, lang_id=lang1_id)
-            mu_lat, var_lat = self.latent(encoded.enc_hiddens, lang1_id)
+            mu_lat, var_lat = self.latent(encoded.enc_hiddens, len1, lang1_id)
             latent_resampled = self.latent.reparameterize(mu_lat, var_lat)
 
             scores, dec_hiddens = self.decoder(encoded, latent_resampled, sent2[:-1], lang_id=lang2_id)
             assert scores.size() == (len2.max() - 1, bs, n_words2)
 
             if lang1_id < lang2_id:
-                mu_lat_joint, var_lat_joint = self.latent_joint(encoded.enc_hiddens, dec_hiddens)
+                mu_lat_joint, var_lat_joint = self.latent_joint(encoded.enc_hiddens, dec_hiddens, len1, len2)
             else:
-                mu_lat_joint, var_lat_joint = self.latent_joint(dec_hiddens, encoded.enc_hiddens)
+                mu_lat_joint, var_lat_joint = self.latent_joint(dec_hiddens, encoded.enc_hiddens, len2, len1)
             # calculate KL divergence loss: KL(p(z|s,t) || q(z|s))
             kld1 = (0.5 * (var_lat - var_lat_joint) + (torch.exp(var_lat_joint) + (mu_lat_joint - mu_lat)**2) / (2 * torch.exp(var_lat)) - 0.5).sum(dim=-1).mean()
 
@@ -735,7 +735,7 @@ class TrainerMT(MultiprocessingEventLoop):
             bos[0, :, params.bos_index[lang2_id]] = 1
             sent2_input = torch.cat([bos, F.softmax(scores / backprop_temperature, -1)], 0)
             encoded = self.encoder(sent2_input, len2, lang_id=lang2_id)
-            mu_lat, var_lat = self.latent(encoded.enc_hiddens, lang2_id)
+            mu_lat, var_lat = self.latent(encoded.enc_hiddens, len2, lang2_id)
             latent_resampled = self.latent.reparameterize(mu_lat, var_lat)
             kld2 = (0.5 * (var_lat - var_lat_joint) + (torch.exp(var_lat_joint) + (mu_lat_joint - mu_lat)**2) / (2 * torch.exp(var_lat)) - 0.5).sum(dim=-1).mean()
 
@@ -744,9 +744,9 @@ class TrainerMT(MultiprocessingEventLoop):
 
         if backprop_temperature == -1:
             if lang2_id < lang3_id:
-                mu_lat_joint, var_lat_joint = self.latent_joint(encoded.enc_hiddens, dec_hiddens)
+                mu_lat_joint, var_lat_joint = self.latent_joint(encoded.enc_hiddens, dec_hiddens, len2, len3)
             else:
-                mu_lat_joint, var_lat_joint = self.latent_joint(dec_hiddens, encoded.enc_hiddens)
+                mu_lat_joint, var_lat_joint = self.latent_joint(dec_hiddens, encoded.enc_hiddens, len3, len2)
             # calculate KL divergence loss: KL(p(z|s,t) || q(z|s))
             kld = (0.5 * (var_lat - var_lat_joint) + (torch.exp(var_lat_joint) + (mu_lat_joint - mu_lat)**2) / (2 * torch.exp(var_lat)) - 0.5).sum(dim=-1).mean()
         else:
