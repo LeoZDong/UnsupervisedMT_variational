@@ -785,14 +785,13 @@ class Latent(nn.Module):
             # current input. This is close to randomly sample from the distribution.
             return mu
 
-    def forward(self, enc_hiddens, lengths, lang_id):
+    def forward(self, enc_hiddens, lang_id):
         # (bs, hidden_dim)
         # enc_hiddens_padded, lengths = pad_packed_sequence(enc_hiddens)
-        logger.info(lengths)
-        # lengths = lengths.cuda().to(torch.float) if torch.cuda.is_available() else lengths.to(torch.float)
-        # enc_hiddens_mean = torch.sum(enc_hiddens, dim=0) / lengths.to(torch.float)[:, None]
+        # lengths = lengths.cuda().to(torch.float)
+        # enc_hiddens_mean = torch.sum(enc_hiddens_padded, dim=0) / lengths[:, None]
+        # enc_hiddens_mean = enc_hiddens_mean.index_select(0, order)
         enc_hiddens_mean = torch.mean(enc_hiddens, dim=0)
-
         mu_layer = self.mu[lang_id]
         mu = mu_layer(enc_hiddens_mean) # (bs, latent_dim)
         var_layer = self.var[lang_id]
@@ -835,15 +834,9 @@ class LatentJoint(nn.Module):
             # current input. This is close to randomly sample from the distribution.
             return mu
 
-    def forward(self, lang1_hiddens, lang2_hiddens, len1, len2):
-        len1 = len1.cuda().to(torch.float)
-        lang1_hiddens_mean = torch.sum(lang1_hiddens, dim=0) / len1[:, None]
-
-        len2 = len2.cuda().to(torch.float)
-        lang2_hiddens_mean = torch.sum(lang2_hiddens, dim=0) / len2[:, None]
-
-        # lang1_hiddens_mean = torch.mean(lang1_hiddens, dim=0) # (bs, hidden_dim)
-        # lang2_hiddens_mean = torch.mean(lang2_hiddens, dim=0) # (bs, hidden_dim)
+    def forward(self, lang1_hiddens, lang2_hiddens):
+        lang1_hiddens_mean = torch.mean(lang1_hiddens, dim=0) # (bs, hidden_dim)
+        lang2_hiddens_mean = torch.mean(lang2_hiddens, dim=0) # (bs, hidden_dim)
         lang_joint_hiddens = torch.cat((lang1_hiddens_mean, lang2_hiddens_mean), dim=1) # (bs, hidden_dim * 2)
 
         # logger.info("lang1_hiddens size:{}".format(lang1_hiddens.size()))
