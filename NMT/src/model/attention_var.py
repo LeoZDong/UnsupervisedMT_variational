@@ -789,8 +789,8 @@ class Latent(nn.Module):
         # (bs, hidden_dim)
         # enc_hiddens_padded, lengths = pad_packed_sequence(enc_hiddens)
         logger.info(lengths)
-        lengths = lengths.cuda().to(torch.float) if torch.cuda.is_available() else lengths.to(torch.float)
-        enc_hiddens_mean = torch.sum(enc_hiddens, dim=0) / lengths[:, None]
+        # lengths = lengths.cuda().to(torch.float) if torch.cuda.is_available() else lengths.to(torch.float)
+        enc_hiddens_mean = torch.sum(enc_hiddens, dim=0) / lengths.to(torch.float)[:, None]
         # enc_hiddens_mean = enc_hiddens_mean.index_select(0, order)
         # enc_hiddens_mean = torch.mean(enc_hiddens, dim=0)
         mu_layer = self.mu[lang_id]
