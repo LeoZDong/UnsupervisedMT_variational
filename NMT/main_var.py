@@ -192,7 +192,7 @@ def get_parser():
                         help="Discriminator loss coefficient")
     parser.add_argument("--lambda_lm", type=str, default="0",
                         help="Language model loss coefficient")
-    parser.add_argument("--lambda_lat", type=int, default=1,
+    parser.add_argument("--lambda_lat", type=float, default=1,
                         help="Latent space KL divergence loss coefficient")
     parser.add_argument("--enc_optimizer", type=str, default="adam,lr=0.0003",
                         help="Encoder optimizer (SGD / RMSprop / Adam, etc.)")
