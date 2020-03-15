@@ -514,7 +514,10 @@ class TrainerMT(MultiprocessingEventLoop):
 
         # total loss
         assert lambda_xe > 0
-        loss = lambda_xe * xe_loss + params.lambda_lat * kld
+        if lang1 == lang2:
+            loss = lambda_xe * xe_loss
+        else:
+            loss = lambda_xe * xe_loss + params.lambda_lat * kld
         if params.lambda_dis:
             loss = loss + params.lambda_dis * dis_loss
 
