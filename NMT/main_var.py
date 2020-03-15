@@ -310,10 +310,10 @@ def main(params):
                     torch.cuda.empty_cache()
 
             # autoencoder training (monolingual data)
-            if params.lambda_xe_mono > 0:
-                for lang in params.mono_directions:
-                    trainer.enc_dec_step(lang, lang, params.lambda_xe_mono)
-                    torch.cuda.empty_cache()
+            # if params.lambda_xe_mono > 0:
+            #     for lang in params.mono_directions:
+            #         trainer.enc_dec_step(lang, lang, params.lambda_xe_mono)
+            #         torch.cuda.empty_cache()
 
             # AE - MT training (on the fly back-translation)
             if params.lambda_xe_otfd > 0 or params.lambda_xe_otfa > 0:
